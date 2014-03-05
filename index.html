@@ -6,29 +6,42 @@
 
         <style>
             * { margin: 0; padding: 0; }
-            body { 
-                width: 100%; background: #a0e5c1; 
-                font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; 
+            body, html { width: 100%; height: 100%; background: #a0e5c1; }
+            .wrapper {
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin: 0 auto -32px;
+            }
+            footer, .push {
+                height: 32px;
+            }
+            footer {
+                size: 12pt;
+                font-family: Helvetica, Arial, "Lucida Grande", sans-serif; 
+                color: Black;
                 text-align: center;
             }
-            #credits { position: relative; top: 200px;}
             iframe { width: 49%; margin: 0; }
             IMG { width: 90%; margin: 20px auto;}
-            a {color: Black}
+            a { color: Black; }
         </style>
+
     </head>
     <body>
-
-        <img id="header" src="therealsurfbort_header.png">
-
-        <!-- The <iframe> (and video player) will replace these <div> tags. -->
-        <div id="left"></div>
-        <div id="right"></div>
-
-        <div id = "credits">
-            <a href="http://alexkaplan.tv">Alex Kaplan<a>, Sculptor. <br>
-            <a href="mailto:james@remeika.us">James Remeika</a>, Fabricator.
+        <div class="wrapper">
+            <img id="header" src="therealsurfbort_header.png">
+            
+            <div class="videos">
+                <!-- The <iframe> (and video player) will replace these <div> tags. -->
+                <div id="left"></div>
+                <div id="right"></div>
+            </div>
+            <div class="push"></div>
         </div>
+        <footer>
+            Made by <a href="http://alexkaplan.tv">Alex</a> &amp; <a href="mailto:james@remeika.us">James</a>.
+        </footer>
 
         <script>
 
@@ -43,8 +56,8 @@
                 leftReady = false,
                 rightReady = false,
                 dualState = DUALSTATES.LOADING,
-                OFFSET = 4480;  //Play right video Offset ms after left video starts
-                
+                OFFSET = 4480,  //Play right video Offset ms after left video starts
+                videosLoaded = 0;
             /*
                 Process URL vars of the form thispage.html?KEY=VAL into
                 the variable urlParams. Function from Stack Overflow user
@@ -108,44 +121,47 @@
             // The API will call this function when the video player is ready.
             function onPlayerReady(event) {
                 event.target.playVideo();
+                videosLoaded++;
                 
-                // By Chris Coyier & tweaked by Mathias Bynens
-                // http://css-tricks.com/fluid-width-youtube-videos
-                $(function() {
-                    // Find all YouTube videos
-                    var $allVideos = $("iframe[src^='https://www.youtube.com']"),
+                if (videosLoaded > 1){
+                    // By Chris Coyier & tweaked by Mathias Bynens
+                    // http://css-tricks.com/fluid-width-youtube-videos
+                    $(function() {
+                        // Find all YouTube videos
+                        var $allVideos = $("iframe[src^='https://www.youtube.com']"),
 
-                    // The element that is fluid width
-                    $fluidEl = $("body");
+                        // The element that is fluid width
+                        $fluidEl = $(".videos");
 
 
-                    // Figure out and save aspect ratio for each video
-                    $allVideos.each(function() {
-                        $(this)
-                            .data('aspectRatio', this.height / this.width)
+                        // Figure out and save aspect ratio for each video
+                        $allVideos.each(function() {
+                            $(this)
+                                .data('aspectRatio', this.height / this.width)
 
-                            // and remove the hard coded width/height
-                            .removeAttr('height')
-                            .removeAttr('width');
+                                // and remove the hard coded width/height
+                                .removeAttr('height')
+                                .removeAttr('width');
+                        });
+
+                        // When the window is resized
+                        // (You'll probably want to debounce this)
+                        $(window).resize(function() {
+
+                        var newWidth = $fluidEl.width()/2.1;
+
+                        // Resize all videos according to their own aspect ratio
+                        $allVideos.each(function() {
+                            var $el = $(this);
+                            $el
+                                .width(newWidth)
+                                .height(newWidth * $el.data('aspectRatio'));
+                        });
+
+                        // Kick off one resize to fix all videos on page load
+                        }).resize();
                     });
-
-                    // When the window is resized
-                    // (You'll probably want to debounce this)
-                    $(window).resize(function() {
-
-                    var newWidth = $fluidEl.width()/2.1;
-
-                    // Resize all videos according to their own aspect ratio
-                    $allVideos.each(function() {
-                        var $el = $(this);
-                        $el
-                            .width(newWidth)
-                            .height(newWidth * $el.data('aspectRatio'));
-                    });
-
-                    // Kick off one resize to fix all videos on page load
-                    }).resize();
-                });
+                }
             }
 
             // The API calls this function when the player's state changes.
