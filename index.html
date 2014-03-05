@@ -11,10 +11,10 @@
                 min-height: 100%;
                 height: auto !important;
                 height: 100%;
-                margin: 0 auto -32px;
+                margin: 0 auto -40px;
             }
             footer, .push {
-                height: 32px;
+                height: 40px;
             }
             footer {
                 size: 12pt;
@@ -22,8 +22,15 @@
                 color: Black;
                 text-align: center;
             }
-            iframe { width: 49%; margin: 0; }
-            IMG { width: 90%; margin: 20px auto;}
+            .videos {
+                margin: 20px 10px;
+                display: block;
+                float: center;
+            }
+            iframe { display: block; }
+            #left { float: left}
+            #right { float: right } 
+            IMG { display: block; width: 90%; margin: 20px auto;}
             a { color: Black; }
         </style>
 
@@ -83,12 +90,16 @@
             // This function creates an <iframe> (and YouTube player)
             //    after the API code downloads.
             function onYouTubeIframeAPIReady() {
+                playerWidth = $('body').width()/2 - 5;
+                console.log(playerWidth);
+                playerHeight = 2 * playerWidth / 3;
+
                 leftPlayer = new YT.Player('left', {
                     playerVars: {
                         autohide: '1'
                     },
-                    height: '600',
-                    width: '900',
+                    height: playerHeight,
+                    width: playerWidth,
                     videoId: '7JClXBoSe6A',
                     events: {
                         'onReady': onPlayerReady,
@@ -100,8 +111,8 @@
                     playerVars: {
                         autohide: '1'
                     },
-                    height: '600',
-                    width: '900',
+                    height: playerHeight,
+                    width: playerWidth,
                     videoId: 'KNXjdeNvN-8',
                     events: {
                         'onReady': onPlayerReady,
@@ -148,7 +159,7 @@
                         // (You'll probably want to debounce this)
                         $(window).resize(function() {
 
-                        var newWidth = $fluidEl.width()/2.1;
+                        var newWidth = $fluidEl.width()/2 - 5;
 
                         // Resize all videos according to their own aspect ratio
                         $allVideos.each(function() {
